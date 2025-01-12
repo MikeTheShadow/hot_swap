@@ -9,16 +9,12 @@ local hot_swap = {
 }
 
 local function OnLoad()
-
     local settings = api.GetSettings("hot_swap")
-    
     if settings.gear_sets == nil then
         settings.gear_sets = {}
         api.SaveSettings()
     end
-    
     settings.show_creation_window = true
-    
     DISPLAY.CreateMainDisplay(settings)
     SETTINGS.CreateSettingsWindow(settings)
 end
@@ -29,7 +25,7 @@ local function OnUpdate()
     DISPLAY.Update()
 end
 
-api.On("UPDATE",OnUpdate)
+api.On("UPDATE", OnUpdate)
 
 local function OnUnload()
     DISPLAY.Destroy()
@@ -43,6 +39,5 @@ local function OnSettingToggle()
 end
 
 hot_swap.OnSettingToggle = OnSettingToggle
-
 
 return hot_swap
