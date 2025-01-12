@@ -3,7 +3,7 @@ local DISPLAY = require("hot_swap/display")
 local SETTINGS = require("hot_swap/settings")
 local hot_swap = {
     name = "Hot Swap",
-    version = "0.3",
+    version = "0.3.1",
     author = "MikeTheShadow",
     desc = "A plugin to hotswap gear and titles."
 }

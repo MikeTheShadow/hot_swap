@@ -58,14 +58,16 @@ local function addCreationButtons(x, y,settings)
             
         }
         
-        for i = 1,19 do
-            item = api.Equipment:GetEquippedItemTooltipInfo(i)
+        local gear_pieces = {1, 3, 4, 8, 6, 9, 5, 7, 15, 2, 10, 11, 12, 13, 16, 17, 18, 19, 28}
+
+        for _, i in ipairs(gear_pieces) do
+            local item = api.Equipment:GetEquippedItemTooltipInfo(i)
             if item ~= nil then
-                new_item = {name = item.name, grade = item.itemGrade}
+                local new_item = {name = item.name, grade = item.itemGrade}
                 if i == 13 or i == 11 or i == 17 then
                     new_item.alternative = true
                 end
-                table.insert(items,new_item)
+                table.insert(items, new_item)
             end
         end
         
@@ -144,8 +146,8 @@ function SETTINGS.CreateSettingsWindow(settings)
         SettingsCanvas:AddAnchor("LEFT", "UIParent", canvas_x, canvas_y)
     end
     
-    function SettingsCanvas:OnDragStart(arg)
-        if arg == "LeftButton" and api.Input:IsShiftKeyDown() then
+    function SettingsCanvas:OnDragStart()
+        if api.Input:IsShiftKeyDown() then
           SettingsCanvas:StartMoving()
           api.Cursor:ClearCursor()
           api.Cursor:SetCursorImage(CURSOR_PATH.MOVE, 0, 0)
@@ -161,7 +163,7 @@ function SETTINGS.CreateSettingsWindow(settings)
         api.Cursor:ClearCursor()
     end
     SettingsCanvas:SetHandler("OnDragStop", SettingsCanvas.OnDragStop)
-    SettingsCanvas:RegisterForDrag("LeftButton")
+    SettingsCanvas:EnableDrag(true)
     
     SettingsCanvas:Show(shown)
     addCreationButtons(50,50,settings)
@@ -173,7 +175,11 @@ function SETTINGS.Toggle()
 end
 
 function SETTINGS.Destroy()
-    SettingsCanvas:Show(false)
+
+    if SettingsCanvas ~= nil then
+        SettingsCanvas:Show(false)
+    end
+
 end
 
 return SETTINGS

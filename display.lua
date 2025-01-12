@@ -138,8 +138,8 @@ function DISPLAY.CreateMainDisplay(settings)
     end
     Canvas:Show(true)
 
-    function Canvas:OnDragStart(arg)
-        if arg == "LeftButton" and api.Input:IsShiftKeyDown() then
+    function Canvas:OnDragStart()
+        if api.Input:IsShiftKeyDown() then
           Canvas:StartMoving()
           api.Cursor:ClearCursor()
           api.Cursor:SetCursorImage(CURSOR_PATH.MOVE, 0, 0)
@@ -155,7 +155,7 @@ function DISPLAY.CreateMainDisplay(settings)
         api.Cursor:ClearCursor()
     end
     Canvas:SetHandler("OnDragStop", Canvas.OnDragStop)
-    Canvas:RegisterForDrag("LeftButton")
+    Canvas:EnableDrag(true)
     
     local closeBtn = Canvas:CreateChildWidget("button", "hotSwap.closeBtn", 0, true)
     closeBtn:Show(true)
