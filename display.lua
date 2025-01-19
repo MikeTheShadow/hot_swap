@@ -3,26 +3,22 @@ local Canvas
 local buttons = {}
 local gear_to_process = {}
 local gearset_name
-
 local function SwitchTitle(title_id)
     api.Player:ChangeAppellation(title_id)
 end
-
 local function EquipItemFromSlot(slot,equip_alternate_slot)
     api.Bag:EquipBagItem(slot, equip_alternate_slot)
 end
-
 function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
-    local button
-    button = Canvas:CreateChildWidget("button", set.name .. "_button", 0, true)
+    local button = Canvas:CreateChildWidget("button", set.name .. "_button", 0, true)
     table.insert(buttons, button)
     button:Show(true)
     button:AddAnchor("TOPLEFT", Canvas, x, y)
     button:SetText(set.name)
     api.Interface:ApplyButtonSkin(button, BUTTON_BASIC.DEFAULT)
-    button_width = button:GetWidth()
-    canvas_width = Canvas:GetWidth()
-    canvas_height = Canvas:GetHeight()
+    local button_width = button:GetWidth()
+    local canvas_width = Canvas:GetWidth()
+    local canvas_height = Canvas:GetHeight()
     if button_width > canvas_width - 50 then
         Canvas:SetExtent(button_width + 50, canvas_height)
     end
@@ -31,9 +27,9 @@ function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
     end
     button:SetHandler("OnClick", function()
         for i = 1, #buttons do
-            selected_button = buttons[i]
+            local selected_button = buttons[i]
             if selected_button ~= button then
-                text = buttons[i]:GetText()
+                local text = buttons[i]:GetText()
                 if text:sub(1, 2) == "> " then
                     text = text:sub(3)
                     buttons[i]:SetText(text)
@@ -46,12 +42,12 @@ function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
         if set.title_id ~= nil then
             SwitchTitle(set.title_id)
         end
-        ignored_numbers = {}
+        local ignored_numbers = {}
         for slot_num = 1, 150 do
             local item = api.Bag:GetBagItemInfo(1, slot_num)
             if item ~= nil then
                 for gear_pos = 1, #set.gear do
-                    do_skip = false
+                    local do_skip = false
                     for ignored_num = 1, #ignored_numbers do
                         if gear_pos == ignored_numbers[ignored_num] then
                             do_skip = true
@@ -59,7 +55,7 @@ function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
                         end
                     end
                     if do_skip ~= true then
-                        gear_item = set.gear[gear_pos]
+                        local gear_item = set.gear[gear_pos]
                         if item.name == gear_item.name and item.itemGrade == gear_item.grade then
                             table.insert(gear_to_process, {
                                 gear_item = gear_item,
@@ -73,16 +69,15 @@ function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
     end)
     return button
 end
-
 local delay = 0
-
 function DISPLAY.CreateDisplays(settings)
     CreateMainDisplay(settings)
 end
-
 function DISPLAY.CreateMainDisplay(settings)
-    gear_sets = settings.gear_sets
-    base_height = 35
+    buttons = {}
+    gear_to_process = {}
+    local gear_sets = settings.gear_sets
+    local base_height = 35
     local canvas_x = settings.x or 100
     local canvas_y = settings.y or 0
     Canvas = api.Interface:CreateEmptyWindow("hotSwapWindow", "UIParent")
@@ -111,7 +106,7 @@ function DISPLAY.CreateMainDisplay(settings)
     end
     Canvas:SetHandler("OnDragStart", Canvas.OnDragStart)
     function Canvas:OnDragStop()
-        current_x, current_y = Canvas:GetOffset()
+        local current_x, current_y = Canvas:GetOffset()
         settings.x = current_x
         settings.y = current_y
         api.SaveSettings()
@@ -160,25 +155,24 @@ function DISPLAY.CreateMainDisplay(settings)
     local offset = 0
     for i = 1, #gear_sets do
         local set = gear_sets[i]
-        local last_button = DISPLAY.createButton(Canvas, set, startX, startY + offset, last_button, settings)
+        local last_button = DISPLAY.createButton(Canvas, set, startX, startY + offset, nil, settings)
         offset = offset + 50
     end
 end
-
 function DISPLAY.Update()
     if #gear_to_process > 0 then
         for button_pos = 1, #buttons do
             buttons[button_pos]:Enable(false)
         end
         if delay == 25 then
-            item_to_equip = table.remove(gear_to_process, 1)
+            local item_to_equip = table.remove(gear_to_process, 1)
             if #gear_to_process == 0 then
                 for i = 1, #buttons do
-                    button = buttons[i]
+                    local button = buttons[i]
                     button:Enable(true)
                 end
             end
-            gearItem = item_to_equip.gear_item
+            local gearItem = item_to_equip.gear_item
             EquipItemFromSlot(item_to_equip.pos, gearItem.alternative or false)
             delay = 0
         end
@@ -187,7 +181,6 @@ function DISPLAY.Update()
         delay = delay + 1
     end
 end
-
 function DISPLAY.Destroy()
     for i = 1, #buttons do
         buttons[i]:Show(false)
@@ -197,5 +190,4 @@ function DISPLAY.Destroy()
         Canvas = nil
     end
 end
-
 return DISPLAY
