@@ -14,31 +14,23 @@ local function addCreationButtons(x, y, settings)
     name_input:SetMaxTextLength(64)
     name_input:CreateGuideText("Enter Set Name")
     name_input:Show(true)
-    local title_input = W_CTRL.CreateEdit("titleEditbox", SettingsCanvas)
-    title_input:AddAnchor("TOPLEFT", SettingsCanvas, x, y + 40)
-    title_input:SetExtent(150, 30)
-    title_input:SetMaxTextLength(64)
-    title_input:CreateGuideText("Enter title ID")
-    title_input:Show(true)
     local add_button = SettingsCanvas:CreateChildWidget("button","add_button", 0, true)
     add_button:Show(true)
-    add_button:AddAnchor("TOPLEFT", SettingsCanvas, x, y + 80)
+    add_button:AddAnchor("TOPLEFT", SettingsCanvas, x, y + 40)
     add_button:SetText("Add")
     api.Interface:ApplyButtonSkin(add_button, BUTTON_BASIC.DEFAULT)
     local remove_button = SettingsCanvas:CreateChildWidget("button","add_button", 0, true)
     remove_button:Show(true)
-    remove_button:AddAnchor("TOPLEFT", SettingsCanvas, x, y + 120)
+    remove_button:AddAnchor("TOPLEFT", SettingsCanvas, x, y + 80)
     remove_button:SetText("Remove")
     api.Interface:ApplyButtonSkin(remove_button, BUTTON_BASIC.DEFAULT)
     if settings.show_creation_window ~= true then
         name_input:Show(false)
-        title_input:Show(false)
         add_button:Show(false)
         remove_button:Show(false)
     end
     add_button:SetHandler("OnClick", function()
         selected_name = name_input:GetText()
-        selected_title = title_input:GetText()
         if is_empty_or_whitespace(selected_name) then
             return
         end
@@ -54,8 +46,11 @@ local function addCreationButtons(x, y, settings)
                 table.insert(items, new_item)
             end
         end
+--         Here it is
         local loadout = { name = selected_name, gear = items }
-        local title_id = tonumber(selected_title)
+
+        local title_id = api.Player:GetShowingAppellation()[1]
+
         if title_id then
             loadout.title_id = title_id
         end
@@ -75,11 +70,6 @@ local function addCreationButtons(x, y, settings)
         DISPLAY.CreateMainDisplay(settings)
         name_input:SetText("")
         name_input:CreateGuideText("Enter Set Name")
-        if title_input:GetText() == "" then
-            return
-        end
-        title_input:SetText("")
-        title_input:CreateGuideText("Enter title ID")
     end)
     remove_button:SetHandler("OnClick", function()
         for i = 1, #settings.gear_sets do
@@ -93,11 +83,6 @@ local function addCreationButtons(x, y, settings)
         end
         name_input:SetText("")
         name_input:CreateGuideText("Enter Set Name")
-        if title_input:GetText() == "" then
-            return
-        end
-        title_input:SetText("")
-        title_input:CreateGuideText("Enter title ID")
     end)
 end
 
