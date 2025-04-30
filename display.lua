@@ -39,28 +39,38 @@ function DISPLAY.createButton(Canvas, set, x, y, last_button, settings)
         if button:GetText():sub(1, 2) ~= "> " then
             button:SetText("> " .. button:GetText())
         end
+
         if set.title_id ~= nil then
             SwitchTitle(set.title_id)
         end
-        local ignored_numbers = {}
-        for slot_num = 1, 150 do
-            local item = api.Bag:GetBagItemInfo(1, slot_num)
-            if item ~= nil then
-                for gear_pos = 1, #set.gear do
-                    local do_skip = false
-                    for ignored_num = 1, #ignored_numbers do
-                        if gear_pos == ignored_numbers[ignored_num] then
-                            do_skip = true
-                            break
-                        end
+
+        gear_to_process = {}
+        local processed_bag_slots = {}
+
+        for gear_pos = 1, #set.gear do
+            local gear_item_needed = set.gear[gear_pos]
+            local found_match_for_this_gear = false
+
+            for slot_num = 1, 150 do
+                local slot_already_processed = false
+                for _, processed_slot in ipairs(processed_bag_slots) do
+                    if slot_num == processed_slot then
+                        slot_already_processed = true
+                        break
                     end
-                    if do_skip ~= true then
-                        local gear_item = set.gear[gear_pos]
-                        if item.name == gear_item.name and item.itemGrade == gear_item.grade then
+                end
+
+                if not slot_already_processed then
+                    local item_in_bag = api.Bag:GetBagItemInfo(1, slot_num)
+                    if item_in_bag ~= nil then
+                        if item_in_bag.name == gear_item_needed.name and item_in_bag.itemGrade == gear_item_needed.grade then
                             table.insert(gear_to_process, {
-                                gear_item = gear_item,
+                                gear_item = gear_item_needed,
                                 pos = slot_num
                             })
+                            table.insert(processed_bag_slots, slot_num)
+                            found_match_for_this_gear = true
+                            break
                         end
                     end
                 end
@@ -87,9 +97,9 @@ function DISPLAY.CreateMainDisplay(settings)
     Canvas.bg:AddAnchor("TOPLEFT", Canvas, 0, 0)
     Canvas.bg:AddAnchor("BOTTOMRIGHT", Canvas, 0, 0)
     if canvas_x ~= 100 and canvas_y ~= 0 then
-        Canvas:AddAnchor("TOPLEFT", "UIParent", canvas_x, canvas_y)
+        Canvas:AddAnchor("TOPLEFT", "UIParent", canvas_x * api.Interface:GetUIScale(), canvas_y * api.Interface:GetUIScale())
     else
-        Canvas:AddAnchor("LEFT", "UIParent", canvas_x, canvas_y)
+        Canvas:AddAnchor("LEFT", "UIParent", canvas_x * api.Interface:GetUIScale(), canvas_y * api.Interface:GetUIScale())
     end
     if settings.hidden then
         Canvas:SetExtent(200, base_height)
