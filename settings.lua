@@ -152,7 +152,7 @@ local function saveCurrentGear(set_name, settings)
 	local loadout = { name = set_name, gear = items }
 	local title_id = api.Player:GetShowingAppellation()[1]
 	if title_id then
-		loadout.title_id = string.format("%d", math.floor(title_id))
+		loadout.title_id = title_id
 	end
 
 	local exists = false
